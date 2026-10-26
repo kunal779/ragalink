@@ -1,0 +1,32 @@
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+htmlcov/
+dist/
+build/
+
+# JavaScript
+node_modules/
+.next/
+.expo/
+out/
+coverage/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.egg-info/
+.claude/
