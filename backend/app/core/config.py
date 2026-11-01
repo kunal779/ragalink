@@ -1,7 +1,7 @@
 ﻿from functools import lru_cache
 from pathlib import Path
 
-from pydantic import SecretStr
+from pydantic import SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -29,6 +29,21 @@ class Settings(BaseSettings):
     redis_host: str = "127.0.0.1"
     redis_port: int = 6379
     redis_password: SecretStr = SecretStr("")
+
+    @model_validator(mode="after")
+    def validate_secrets(self) -> "Settings":
+        if self.environment != "local":
+            if not self.postgres_password.get_secret_value():
+                raise ValueError(
+                    "POSTGRES_PASSWORD must be configured outside local environment."
+                )
+
+            if not self.redis_password.get_secret_value():
+                raise ValueError(
+                    "REDIS_PASSWORD must be configured outside local environment."
+                )
+
+        return self
 
 
 @lru_cache
