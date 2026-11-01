@@ -1,0 +1,53 @@
+﻿services:
+  postgres:
+    image: postgis/postgis:17-3.6
+    container_name: ragalink-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ragalink
+      POSTGRES_USER: ragalink_local
+      POSTGRES_PASSWORD: ragalink_local_dev_password
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - ragalink_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ragalink_local -d ragalink"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: ragalink-redis
+    restart: unless-stopped
+    command:
+      [
+        "redis-server",
+        "--requirepass",
+        "ragalink_local_dev_password"
+      ]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - ragalink_redis_data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "-a",
+          "ragalink_local_dev_password",
+          "ping"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ragalink_postgres_data:
+  ragalink_redis_data:
